@@ -8,5 +8,6 @@
     "vscode": {
       "extensions": ["esbenp.prettier-vscode", "dbaeumer.vscode-eslint"]
     }
-  }
+  },
+  "postCreateCommand": "pnpm install && pnpm typegen"
 }
