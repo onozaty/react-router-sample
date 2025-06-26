@@ -9,5 +9,8 @@
       "extensions": ["esbenp.prettier-vscode", "dbaeumer.vscode-eslint"]
     }
   },
-  "postCreateCommand": "pnpm install && pnpm typegen"
+  "postCreateCommand": "pnpm install && pnpm typegen",
+  "features": {
+    "ghcr.io/anthropics/devcontainer-features/claude-code:latest": {}
+  }
 }
