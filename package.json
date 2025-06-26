@@ -7,7 +7,8 @@
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typegen": "react-router typegen",
-    "typecheck": "pnpm typegen && tsc"
+    "typecheck": "pnpm typegen && tsc",
+    "format": "prettier --write app/**/*.{ts,tsx}"
   },
   "dependencies": {
     "@react-router/node": "^7.5.3",
@@ -27,6 +28,7 @@
     "@types/node": "^20",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "prettier": "3.6.1",
     "tailwindcss": "^4.1.4",
     "tw-animate-css": "^1.3.4",
     "typescript": "^5.8.3",
