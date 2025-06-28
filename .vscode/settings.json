@@ -1,6 +1,6 @@
 {
-  "typescript.preferences.importModuleSpecifier": "relative",
-  "[typescript]": {
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "[typescript][typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
