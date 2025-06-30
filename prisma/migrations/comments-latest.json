@@ -1,0 +1,68 @@
+{
+  "users": {
+    "table": {
+      "tableName": "users",
+      "comment": "ユーザ基本情報テーブル"
+    },
+    "columns": [
+      {
+        "tableName": "users",
+        "columnName": "user_id",
+        "comment": "ユーザID"
+      },
+      {
+        "tableName": "users",
+        "columnName": "email",
+        "comment": "メールアドレス"
+      },
+      {
+        "tableName": "users",
+        "columnName": "username",
+        "comment": "ユーザ名"
+      },
+      {
+        "tableName": "users",
+        "columnName": "created_at",
+        "comment": "作成日時"
+      },
+      {
+        "tableName": "users",
+        "columnName": "updated_at",
+        "comment": "更新日時"
+      }
+    ]
+  },
+  "user_auths": {
+    "table": {
+      "tableName": "user_auths",
+      "comment": "ユーザ認証情報テーブル"
+    },
+    "columns": [
+      {
+        "tableName": "user_auths",
+        "columnName": "user_id",
+        "comment": "ユーザID"
+      },
+      {
+        "tableName": "user_auths",
+        "columnName": "hashed_password",
+        "comment": "パスワード(ハッシュ)"
+      },
+      {
+        "tableName": "user_auths",
+        "columnName": "last_login_at",
+        "comment": "最終ログイン日時"
+      },
+      {
+        "tableName": "user_auths",
+        "columnName": "created_at",
+        "comment": "作成日時"
+      },
+      {
+        "tableName": "user_auths",
+        "columnName": "updated_at",
+        "comment": "更新日時"
+      }
+    ]
+  }
+}

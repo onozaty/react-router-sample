@@ -8,9 +8,13 @@
     "start": "react-router-serve ./build/server/index.js",
     "typegen": "react-router typegen",
     "typecheck": "pnpm typegen && tsc",
-    "format": "prettier --write app/**/*.{ts,tsx}"
+    "format": "prettier --write app/**/*.{ts,tsx}",
+    "db:migrate": "prisma-schema-fixer && prisma migrate dev && prisma generate && npm run db:deploy",
+    "db:reset": "prisma migrate reset --skip-generate",
+    "db:deploy": "prisma migrate deploy"
   },
   "dependencies": {
+    "@prisma/client": "6.10.1",
     "@radix-ui/react-slot": "^1.2.3",
     "@react-router/node": "^7.5.3",
     "@react-router/serve": "^7.5.3",
@@ -24,12 +28,15 @@
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
+    "@onozaty/prisma-db-comments-generator": "^1.3.0",
+    "@onozaty/prisma-schema-fixer": "^1.1.1",
     "@react-router/dev": "^7.5.3",
     "@tailwindcss/vite": "^4.1.4",
     "@types/node": "^20",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "prettier": "3.6.1",
+    "prisma": "^6.10.1",
     "tailwindcss": "^4.1.4",
     "tw-animate-css": "^1.3.4",
     "typescript": "^5.8.3",

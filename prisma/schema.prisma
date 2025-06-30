@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator comments {
+  provider = "prisma-db-comments-generator"
+}
+
+/// ユーザ基本情報テーブル
+model User {
+  /// ユーザID
+  userId    Int      @id @default(autoincrement()) @map("user_id")
+  /// メールアドレス
+  email     String   @unique @db.VarChar(255)
+  /// ユーザ名
+  username  String?  @db.VarChar(100)
+  /// 作成日時
+  createdAt DateTime @default(now()) @map("created_at")
+  /// 更新日時
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  userAuth UserAuth?
+
+  @@map("users")
+}
+
+/// ユーザ認証情報テーブル
+model UserAuth {
+  /// ユーザID
+  userId         Int       @id @map("user_id")
+  /// パスワード(ハッシュ)
+  hashedPassword String    @map("hashed_password") @db.VarChar(255)
+  /// 最終ログイン日時
+  lastLoginAt    DateTime? @map("last_login_at")
+  /// 作成日時
+  createdAt      DateTime  @default(now()) @map("created_at")
+  /// 更新日時
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("user_auths")
+}
