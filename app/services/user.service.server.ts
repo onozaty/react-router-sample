@@ -88,3 +88,10 @@ export const checkEmailExists = async (
 
   return true;
 };
+
+export const updateLastLogin = async (userId: number) => {
+  await prisma.userAuth.update({
+    where: { userId },
+    data: { lastLoginAt: new Date() },
+  });
+};

@@ -3,7 +3,8 @@
     "allow": [
       "Bash(pnpm typecheck:*)",
       "Bash(pnpm format:*)",
-      "WebFetch(domain:reactrouter.com)"
+      "WebFetch(domain:reactrouter.com)",
+      "Bash(pnpm run:*)"
     ],
     "deny": []
   }

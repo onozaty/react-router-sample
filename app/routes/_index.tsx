@@ -1,5 +1,6 @@
-import { Link } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import { Button } from "~/components/ui/button";
+import { authUserContext } from "~/services/auth.service.server";
 import type { Route } from "./+types/_index";
 
 export const meta = ({}: Route.MetaArgs) => {
@@ -9,12 +10,40 @@ export const meta = ({}: Route.MetaArgs) => {
   ];
 };
 
+export async function loader({ context }: Route.LoaderArgs) {
+  const user = context.get(authUserContext);
+  return {
+    user: user || null,
+  };
+}
+
 export default function Home() {
+  const { user } = useLoaderData<typeof loader>();
+
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center">
-      <Button asChild>
-        <Link to="/users">ユーザー一覧</Link>
-      </Button>
+    <div className="flex min-h-svh flex-col items-center justify-center gap-4">
+      <h1 className="text-2xl font-bold">Welcome!</h1>
+
+      {user ? (
+        <div className="text-center space-y-4">
+          <p>こんにちは、{user.email}さん！</p>
+          <div className="flex gap-4">
+            <Button asChild>
+              <Link to="/users">ユーザー一覧</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/logout">ログアウト</Link>
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="text-center space-y-4">
+          <p>ログインしてください</p>
+          <Button asChild>
+            <Link to="/login">ログイン</Link>
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

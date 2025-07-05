@@ -16,7 +16,7 @@ import {
   deleteUser,
   getUserById,
   updateUser,
-} from "~/services/user.service";
+} from "~/services/user.service.server";
 import type { Route } from "./+types/users.$id.edit";
 
 const updateUserSchema = z

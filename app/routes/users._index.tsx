@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { getAllUsers } from "~/services/user.service";
+import { getAllUsers } from "~/services/user.service.server";
 import type { Route } from "./+types/users._index";
 
 export const loader = async ({}: Route.LoaderArgs) => {
