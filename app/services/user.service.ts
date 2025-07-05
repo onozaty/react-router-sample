@@ -1,7 +1,13 @@
 import type { User } from "@prisma/client";
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
+
+const hashPassword = async (password: string): Promise<string> => {
+  const salt = await bcrypt.genSalt();
+  return await bcrypt.hash(password, salt);
+};
 
 export const getAllUsers = async () => {
   return await prisma.user.findMany({
@@ -22,8 +28,8 @@ export const createUser = async (
 ) => {
   const { password, ...userData } = data;
 
-  // パスワードをハッシュ化（実際の実装では適切なハッシュ化ライブラリを使用）
-  const hashedPassword = password; // TODO: 実際のハッシュ化実装
+  // パスワードをハッシュ化
+  const hashedPassword = await hashPassword(password);
 
   return await prisma.user.create({
     data: {
@@ -51,7 +57,7 @@ export const updateUser = async (
 
   // パスワードが提供された場合は認証情報も更新
   if (password) {
-    const hashedPassword = password; // TODO: 実際のハッシュ化実装
+    const hashedPassword = await hashPassword(password);
     await prisma.userAuth.upsert({
       where: { userId },
       update: { hashedPassword },
