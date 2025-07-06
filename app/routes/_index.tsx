@@ -13,7 +13,7 @@ export const meta = ({}: Route.MetaArgs) => {
 export async function loader({ context }: Route.LoaderArgs) {
   const user = context.get(authUserContext);
   return {
-    user: user || null,
+    user,
   };
 }
 

@@ -1,7 +1,7 @@
 import type { FieldMetadata } from "@conform-to/react";
 import { getInputProps } from "@conform-to/react";
-import { Input } from "./input";
-import { Label } from "./label";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 
 type InputType =
   | "text"

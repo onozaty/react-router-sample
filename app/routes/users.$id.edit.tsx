@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { Field } from "~/components/ui/field";
+import { Field } from "~/components/field";
 import {
   checkEmailExists,
   deleteUser,
