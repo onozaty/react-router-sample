@@ -5,11 +5,14 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "react-router";
 
 import type { Route } from "./+types/root";
 import "./app.css";
 import { authMiddleware } from "./middleware/auth";
+import { authUserContext } from "./services/auth.service.server";
+import { Header } from "./components/header";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -25,6 +28,13 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export const unstable_middleware = [authMiddleware];
+
+export async function loader({ context }: Route.LoaderArgs) {
+  const user = context.get(authUserContext);
+  return {
+    user: user || null,
+  };
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -45,7 +55,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  const { user } = useLoaderData<typeof loader>();
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header user={user} />
+      <main>
+        <Outlet />
+      </main>
+    </div>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

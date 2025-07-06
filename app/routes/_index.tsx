@@ -21,7 +21,7 @@ export default function Home() {
   const { user } = useLoaderData<typeof loader>();
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-4">
+    <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 p-4">
       <h1 className="text-2xl font-bold">Welcome!</h1>
 
       {user ? (
@@ -30,9 +30,6 @@ export default function Home() {
           <div className="flex gap-4">
             <Button asChild>
               <Link to="/users">ユーザー一覧</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link to="/logout">ログアウト</Link>
             </Button>
           </div>
         </div>
