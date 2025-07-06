@@ -1,8 +1,6 @@
 import type { User } from "@prisma/client";
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
-
-const prisma = new PrismaClient();
+import { prisma } from "~/lib/db.server";
 
 const hashPassword = async (password: string): Promise<string> => {
   const salt = await bcrypt.genSalt();

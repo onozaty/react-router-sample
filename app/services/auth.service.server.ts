@@ -1,9 +1,7 @@
 import { unstable_createContext } from "react-router";
 import bcrypt from "bcrypt";
-import { PrismaClient } from "@prisma/client";
 import { getSession } from "~/sessions.server";
-
-const prisma = new PrismaClient();
+import { prisma } from "~/lib/db.server";
 
 export interface AuthUser {
   userId: number;
