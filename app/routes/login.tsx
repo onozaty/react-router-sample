@@ -7,7 +7,7 @@ import { Card } from "~/components/ui/card";
 import { Field } from "~/components/field";
 import { authenticateUser } from "~/services/auth.service.server";
 import { updateLastLogin } from "~/services/user.service.server";
-import { commitSession, getSession } from "~/sessions.server";
+import { commitSession, getSession } from "~/lib/sessions.server";
 import type { Route } from "./+types/login";
 
 const loginSchema = z.object({

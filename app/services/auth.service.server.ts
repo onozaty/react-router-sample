@@ -1,6 +1,6 @@
 import { unstable_createContext } from "react-router";
 import bcrypt from "bcrypt";
-import { getSession } from "~/sessions.server";
+import { getSession } from "~/lib/sessions.server";
 import { prisma } from "~/lib/db.server";
 
 export interface AuthUser {

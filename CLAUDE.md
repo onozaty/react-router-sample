@@ -8,13 +8,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### 開発
 - `pnpm run dev` - 開発サーバーを起動（HMR有効、http://localhost:5173）
-- `pnpm run build` - プロダクションビルドを作成
+- `pnpm run build` - プロダクションビルドを作成（React Router + サーバー）
+- `pnpm run build:react-router` - React Routerクライアントビルド
+- `pnpm run build:server` - サーバーサイドビルド（esbuild使用）
+- `pnpm run prd` - プロダクション実行（ビルド後起動）
+- `pnpm run start` - プロダクションサーバーを起動
 - `pnpm run typecheck` - TypeScript型チェックを実行（typegen含む）
 - `pnpm run format` - Prettierでコードフォーマット
 
 ### データベース操作
 - `pnpm run db:migrate` - スキーマ修正、マイグレート、生成、デプロイを実行
 - `pnpm run db:reset` - データベースをリセット（生成をスキップ）
+- `pnpm run db:deploy` - Prismaマイグレーションをデプロイ
 - `pnpm run db:seed` - 初期データでデータベースをシード
 
 ### 型生成
@@ -41,6 +46,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **レイアウト**: Headerコンポーネントを`root.tsx`のAppコンポーネントに直接統合してグローバル表示
 - **型安全性**: ルート、ローダー、アクションの自動型生成
 
+### ビルドとデプロイ
+- **React Routerビルド**: `react-router build`でクライアント（`build/client/`）とサーバー（`build/server/`）両方をビルド
+- **カスタムサーバービルド**: `build-runner.ts`でesbuildによりserver.tsを`build/server.js`として出力
+- **バンドル設定**: 依存関係は外部扱い（`external: ["node_modules"]`）、minify有効
+- **プロダクション実行**: `pnpm run prd`でビルド後にサーバー起動
+
 ### UIコンポーネント
 - **スタイリング**: カスタムユーティリティクラス付きTailwindCSS
 - **基本コンポーネント**: `app/components/ui/`にshadcn/ui（Radix UIプリミティブ）を配置（Button、Card、Inputなど）
@@ -51,7 +62,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **サーバーサイドサービス**: `app/services/`で認証とユーザー管理
 - **型安全性**: ルートパラメータ、ローダーデータ、アクションデータでReact Routerの型生成を活用
 - **フォーム処理**: 変更にReact RouterのFormコンポーネントを使用
-- **セッション管理**: `app/sessions.server.ts`でCookieベースセッションを処理
+- **セッション管理**: `app/lib/sessions.server.ts`でCookieベースセッションを処理
 
 ## データベーススキーマ注意点
 - ユーザーはセキュリティのため別の認証テーブル（UserAuth）を持つ
@@ -71,6 +82,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **変更後の確認**: 一通りの変更を行った後は必ず`pnpm run typecheck`でエラーが無いことを確認
 - **型安全性の維持**: TypeScriptエラーを残したまま作業を終了しない
 - **any型の禁止**: `any`型の使用を避け、適切な型定義を行う
+- **コードフォーマット**: TypeScriptファイル（.ts/.tsx）の編集時、Prettierが自動実行されるPostToolUseフックを設定
 
 ### その他
 - パッケージマネージャーとしてpnpmを使用
@@ -78,3 +90,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 一貫したフォーマットのためPrettierを設定
 - すべての認証ルートはユーザー未認証時に`/login`にリダイレクト
 - シードデータには管理者ユーザーが含まれる（デフォルト: admin@example.com/admin123）
+
+## Claude Code設定
+- **自動フォーマット**: `.claude/settings.json`でTypeScriptファイル編集時のPrettier自動実行を設定
+- **権限設定**: 特定のコマンドとWebフェッチのみ許可
