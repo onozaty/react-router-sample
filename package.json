@@ -46,6 +46,7 @@
     "@onozaty/prisma-schema-fixer": "^1.1.1",
     "@react-router/dev": "^7.6.3",
     "@tailwindcss/vite": "^4.1.4",
+    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/bcrypt": "^5.0.2",
     "@types/compression": "^1.8.1",
     "@types/express": "^5.0.3",

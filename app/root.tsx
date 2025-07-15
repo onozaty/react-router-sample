@@ -7,12 +7,11 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from "react-router";
-
 import type { Route } from "./+types/root";
 import "./app.css";
+import { Header } from "./components/header";
 import { authMiddleware } from "./middleware/auth";
 import { authUserContext } from "./services/auth.service.server";
-import { Header } from "./components/header";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

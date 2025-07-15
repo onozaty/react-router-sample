@@ -1,6 +1,6 @@
 import { Link, Form } from "react-router";
-import { Button } from "./ui/button";
 import type { AuthUser } from "~/services/auth.service.server";
+import { Button } from "./ui/button";
 
 interface HeaderProps {
   user: AuthUser | null;

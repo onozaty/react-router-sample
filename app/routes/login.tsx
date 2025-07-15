@@ -2,12 +2,12 @@ import { getFormProps, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { Form, redirect, useActionData } from "react-router";
 import { z } from "zod";
+import { Field } from "~/components/field";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
-import { Field } from "~/components/field";
+import { commitSession, getSession } from "~/lib/sessions.server";
 import { authenticateUser } from "~/services/auth.service.server";
 import { updateLastLogin } from "~/services/user.service.server";
-import { commitSession, getSession } from "~/lib/sessions.server";
 import type { Route } from "./+types/login";
 
 const loginSchema = z.object({
