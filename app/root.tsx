@@ -7,6 +7,7 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from "react-router";
+import { loggingMiddleware } from "~/middleware/logging";
 import type { Route } from "./+types/root";
 import "./app.css";
 import { Header } from "./components/header";
@@ -26,7 +27,7 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
-export const unstable_middleware = [authMiddleware];
+export const unstable_middleware = [authMiddleware, loggingMiddleware];
 
 export async function loader({ context }: Route.LoaderArgs) {
   const user = context.get(authUserContext);

@@ -1,6 +1,5 @@
 import compression from "compression";
 import express from "express";
-import morgan from "morgan";
 
 // Short-circuit the type-checking of the built output.
 const BUILD_PATH = "./server/index.js";
@@ -37,7 +36,6 @@ if (DEVELOPMENT) {
     "/assets",
     express.static("build/client/assets", { immutable: true, maxAge: "1y" }),
   );
-  app.use(morgan("tiny"));
   app.use(express.static("build/client", { maxAge: "1h" }));
   app.use(await import(BUILD_PATH).then((mod) => mod.app));
 }
