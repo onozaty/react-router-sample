@@ -14,6 +14,9 @@ importers:
       '@conform-to/zod':
         specifier: ^1.8.0
         version: 1.8.1(zod@3.25.76)
+      '@fontsource/inter':
+        specifier: ^5.2.6
+        version: 5.2.6
       '@prisma/client':
         specifier: 6.10.1
         version: 6.10.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3)
@@ -501,6 +504,9 @@ packages:
   '@eslint/plugin-kit@0.3.3':
     resolution: {integrity: sha512-1+WqvgNMhmlAambTvT3KPtCl/Ibr68VldY2XY40SL1CE0ZXiakFR/cbTspaF5HsnpDMvcYYoJHfl4980NBjGag==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@fontsource/inter@5.2.6':
+    resolution: {integrity: sha512-CZs9S1CrjD0jPwsNy9W6j0BhsmRSQrgwlTNkgQXTsAeDRM42LBRLo3eo9gCzfH4GvV7zpyf78Ozfl773826csw==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -3153,6 +3159,8 @@ snapshots:
     dependencies:
       '@eslint/core': 0.15.1
       levn: 0.4.1
+
+  '@fontsource/inter@5.2.6': {}
 
   '@humanfs/core@0.19.1': {}
 
