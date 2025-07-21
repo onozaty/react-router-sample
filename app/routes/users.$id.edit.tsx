@@ -98,7 +98,7 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
   return redirect("/users");
 };
 
-export const meta = ({}: Route.MetaArgs) => {
+export const meta = () => {
   return [
     { title: "ユーザー編集" },
     { name: "description", content: "ユーザー情報の編集" },

@@ -18,12 +18,12 @@ import {
 import { getAllUsers } from "~/services/user.service.server";
 import type { Route } from "./+types/users._index";
 
-export const loader = async ({}: Route.LoaderArgs) => {
+export const loader = async () => {
   const users = await getAllUsers();
   return { users };
 };
 
-export const meta = ({}: Route.MetaArgs) => {
+export const meta = () => {
   return [
     { title: "ユーザー管理" },
     { name: "description", content: "ユーザーの一覧・管理画面" },

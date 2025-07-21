@@ -55,7 +55,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
   return redirect("/users");
 };
 
-export const meta = ({}: Route.MetaArgs) => {
+export const meta = () => {
   return [
     { title: "ユーザー登録" },
     { name: "description", content: "新規ユーザーの登録" },

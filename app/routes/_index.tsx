@@ -3,7 +3,7 @@ import { Button } from "~/components/ui/button";
 import { authUserContext } from "~/services/auth.service.server";
 import type { Route } from "./+types/_index";
 
-export const meta = ({}: Route.MetaArgs) => {
+export const meta = () => {
   return [
     { title: "New React Router App" },
     { name: "description", content: "Welcome to React Router!" },

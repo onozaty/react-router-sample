@@ -15,7 +15,7 @@ const loginSchema = z.object({
   password: z.string().min(1, "パスワードを入力してください"),
 });
 
-export const meta = ({}: Route.MetaArgs) => {
+export const meta = () => {
   return [{ title: "ログイン" }];
 };
 

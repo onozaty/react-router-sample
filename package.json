@@ -12,6 +12,8 @@
     "typegen": "react-router typegen",
     "typegen:watch": "react-router typegen --watch",
     "typecheck": "pnpm typegen && tsc",
+    "lint": "eslint .",
+    "check": "pnpm typecheck && pnpm lint",
     "format": "prettier --write **/*.{ts,tsx}",
     "db:migrate": "prisma-schema-fixer && prisma migrate dev && prisma generate && npm run db:deploy",
     "db:reset": "prisma migrate reset --skip-generate",
@@ -42,6 +44,7 @@
     "zod": "^3.25.67"
   },
   "devDependencies": {
+    "@eslint/js": "^9.31.0",
     "@onozaty/prisma-db-comments-generator": "^1.3.0",
     "@onozaty/prisma-schema-fixer": "^1.1.1",
     "@react-router/dev": "^7.6.3",
@@ -56,12 +59,16 @@
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "esbuild": "^0.25.6",
+    "eslint": "^9.31.0",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^16.3.0",
     "prettier": "3.6.1",
     "prisma": "^6.10.1",
     "tailwindcss": "^4.1.4",
     "tsx": "^4.20.3",
     "tw-animate-css": "^1.3.4",
     "typescript": "^5.8.3",
+    "typescript-eslint": "^8.37.0",
     "vite": "^6.3.3",
     "vite-tsconfig-paths": "^5.1.4"
   },
