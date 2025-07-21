@@ -27,7 +27,7 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
-export const unstable_middleware = [authMiddleware, loggingMiddleware];
+export const unstable_middleware = [loggingMiddleware, authMiddleware];
 
 export async function loader({ context }: Route.LoaderArgs) {
   const user = context.get(authUserContext);
