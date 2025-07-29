@@ -1,5 +1,10 @@
 import compression from "compression";
-import express from "express";
+import express, {
+  type NextFunction,
+  type Request,
+  type Response,
+} from "express";
+import { logger } from "./app/lib/logger.server";
 
 // Short-circuit the type-checking of the built output.
 const BUILD_PATH = "./server/index.js";
@@ -8,11 +13,38 @@ const PORT = Number.parseInt(process.env.PORT || "3000");
 
 const app = express();
 
+// Custom logging middleware for start and end logs
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const start = performance.now();
+  const requestLogger = logger.child({
+    method: req.method,
+    url: req.url,
+    userAgent: req.headers["user-agent"],
+  });
+
+  // Start log
+  requestLogger.info("Request started");
+
+  // End log when response finishes
+  res.on("finish", () => {
+    const duration = performance.now() - start;
+    requestLogger.info(
+      {
+        statusCode: res.statusCode,
+        duration: `${duration.toFixed(3)}ms`,
+      },
+      "Request completed",
+    );
+  });
+
+  next();
+});
+
 app.use(compression());
 app.disable("x-powered-by");
 
 if (DEVELOPMENT) {
-  console.log("Starting development server");
+  logger.info("Starting development server");
   const viteDevServer = await import("vite").then((vite) =>
     vite.createServer({
       server: { middlewareMode: true },
@@ -27,11 +59,12 @@ if (DEVELOPMENT) {
       if (typeof error === "object" && error instanceof Error) {
         viteDevServer.ssrFixStacktrace(error);
       }
+      console.warn("Error during SSR:", error);
       next(error);
     }
   });
 } else {
-  console.log("Starting production server");
+  logger.info("Starting production server");
   app.use(
     "/assets",
     express.static("build/client/assets", { immutable: true, maxAge: "1y" }),
@@ -41,5 +74,5 @@ if (DEVELOPMENT) {
 }
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  logger.info(`Server is running on http://localhost:${PORT}`);
 });
