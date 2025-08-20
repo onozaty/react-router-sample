@@ -1,6 +1,9 @@
 {
   "name": "Node.js & PostgreSQL",
   "dockerComposeFile": "docker-compose.yml",
+  "containerEnv": {
+    "CLAUDE_CONFIG_DIR": "/home/node/.claude"
+  },
   "service": "app",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "remoteUser": "node",
