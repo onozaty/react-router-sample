@@ -27,7 +27,7 @@ services:
       - 8080:80
     volumes:
       - pgadmin-data:/var/lib/pgadmin
-      - ./pgamin/servers.json:/pgadmin4/servers.json
+      - ./pgadmin/servers.json:/pgadmin4/servers.json
     environment:
       PGADMIN_DEFAULT_EMAIL: user@example.com
       PGADMIN_DEFAULT_PASSWORD: password
