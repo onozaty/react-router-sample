@@ -13,6 +13,7 @@ export default defineConfig({
     setupFiles: ["./test/setup.ts"],
     // テストファイルを順次実行（実DB使用のため）
     fileParallelism: false,
+    exclude: ["node_modules", "e2e"],
   },
   server: {
     host: "0.0.0.0",

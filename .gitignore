@@ -7,3 +7,9 @@
 
 # Test coverage
 coverage/
+
+# Playwright
+/e2e-results/
+/playwright-report/
+/blob-report/
+/.auth/
