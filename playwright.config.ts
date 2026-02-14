@@ -13,6 +13,9 @@ export default defineConfig({
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
+    launchOptions: {
+      slowMo: Number(process.env.SLOW_MO) || 0,
+    },
   },
   projects: [
     {
