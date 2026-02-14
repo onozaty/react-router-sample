@@ -14,6 +14,9 @@ export default defineConfig({
     // テストファイルを順次実行（実DB使用のため）
     fileParallelism: false,
     exclude: ["node_modules", "e2e"],
+    coverage: {
+      include: ["app/**/*.{ts,tsx}"],
+    },
   },
   server: {
     host: "0.0.0.0",

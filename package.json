@@ -19,6 +19,7 @@
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "coverage:all": "rm -rf coverage coverage-e2e coverage-all && pnpm run test:coverage && E2E_COVERAGE=1 PLAYWRIGHT_BASE_URL=http://localhost:3000 playwright test && COVERAGE_INCLUDE_UNIT=1 tsx scripts/generate-e2e-coverage.ts",
     "db:migrate": "prisma-schema-fixer && prisma migrate dev && prisma generate && npm run db:deploy",
     "db:reset": "prisma migrate reset --skip-generate",
     "db:deploy": "prisma migrate deploy",
@@ -26,6 +27,7 @@
     "db:test:deploy": "dotenv -e .env.test -- pnpm run db:deploy",
     "db:test:reset": "dotenv -e .env.test -- prisma migrate reset --skip-generate --force",
     "e2e": "playwright test",
+    "e2e:coverage": "rm -rf coverage-e2e && E2E_COVERAGE=1 PLAYWRIGHT_BASE_URL=http://localhost:3000 playwright test && tsx scripts/generate-e2e-coverage.ts",
     "e2e:ui": "playwright test --ui-host=0.0.0.0",
     "e2e:headed": "SLOW_MO=1000 playwright test --headed",
     "e2e:report": "playwright show-report --host 0.0.0.0"
@@ -79,6 +81,7 @@
     "eslint": "^9.31.0",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^16.3.0",
+    "monocart-coverage-reports": "^2.12.9",
     "prettier": "3.6.1",
     "prisma": "^6.10.1",
     "tailwindcss": "^4.1.4",

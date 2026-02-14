@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./coverage";
 import { createTestUser, resetDb } from "@test/helpers/db";
 
 test.describe("ログイン画面", () => {

@@ -6,7 +6,7 @@
 /build/
 
 # Test coverage
-coverage/
+coverage*/
 
 # Playwright
 /e2e-results/

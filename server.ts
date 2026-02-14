@@ -4,6 +4,7 @@ import express, {
   type Request,
   type Response,
 } from "express";
+import * as v8 from "node:v8";
 import { logger } from "./app/lib/logger.server";
 
 // Short-circuit the type-checking of the built output.
@@ -42,6 +43,19 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use(compression());
 app.disable("x-powered-by");
+
+// Flush V8 coverage on demand during E2E to avoid missing data on forced shutdown.
+if (process.env.E2E_COVERAGE === "1") {
+  app.post("/__coverage/flush", (_req, res) => {
+    try {
+      v8.takeCoverage();
+      res.status(204).end();
+    } catch (error) {
+      logger.warn({ error }, "Failed to flush V8 coverage");
+      res.status(500).end();
+    }
+  });
+}
 
 if (DEVELOPMENT) {
   logger.info("Starting development server");
