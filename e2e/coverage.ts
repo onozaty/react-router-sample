@@ -5,47 +5,45 @@ import path from "node:path";
 const COVERAGE_ENABLED = process.env.E2E_COVERAGE === "1";
 const CLIENT_COVERAGE_DIR = path.resolve("coverage-e2e/.v8/client");
 
-function toSafeFileName(value: string): string {
-  return value.replace(/[^a-zA-Z0-9_-]/g, "_");
-}
+export const test = base.extend<{ autoCoverage: void }>({
+  autoCoverage: [
+    async ({ context }, use, testInfo) => {
+      const isChromium = test.info().project.name === "chromium";
 
-export const test = base.extend({
-  page: async ({ page, request }, use, testInfo) => {
-    if (COVERAGE_ENABLED) {
-      await page.coverage.startJSCoverage({ resetOnNavigation: false });
-    }
+      if (COVERAGE_ENABLED && isChromium) {
+        context.on("page", (page) => {
+          page.coverage.startJSCoverage({ resetOnNavigation: false });
+        });
+      }
 
-    await use(page);
+      await use();
 
-    if (!COVERAGE_ENABLED) {
-      return;
-    }
+      if (!COVERAGE_ENABLED || !isChromium) return;
 
-    const entries = await page.coverage.stopJSCoverage();
-    await mkdir(CLIENT_COVERAGE_DIR, { recursive: true });
+      const coverageList = await Promise.all(
+        context.pages().map((page) => page.coverage.stopJSCoverage()),
+      );
+      const entries = coverageList.flat();
+      if (entries.length === 0) return;
 
-    const fileName = toSafeFileName(
-      [
-        testInfo.project.name,
-        testInfo.title,
-        `retry-${testInfo.retry}`,
-        Date.now().toString(),
-      ].join("-"),
-    );
+      await mkdir(CLIENT_COVERAGE_DIR, { recursive: true });
+      const fileName = `${testInfo.project.name}-${Date.now()}.json`;
+      await writeFile(
+        path.join(CLIENT_COVERAGE_DIR, fileName),
+        JSON.stringify(entries),
+        "utf8",
+      );
 
-    await writeFile(
-      path.join(CLIENT_COVERAGE_DIR, `${fileName}.json`),
-      JSON.stringify(entries),
-      "utf8",
-    );
-
-    // Flush server-side V8 coverage while server is still running.
-    try {
-      await request.post("/__coverage/flush");
-    } catch {
-      // Best effort.
-    }
-  },
+      // サーバー側のV8カバレッジをフラッシュする。
+      try {
+        const request = context.request;
+        await request.post("/__coverage/flush");
+      } catch {
+        // Best effort.
+      }
+    },
+    { scope: "test", auto: true },
+  ],
 });
 
 export { expect };

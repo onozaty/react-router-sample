@@ -44,7 +44,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use(compression());
 app.disable("x-powered-by");
 
-// Flush V8 coverage on demand during E2E to avoid missing data on forced shutdown.
+// E2Eテスト中にサーバー側のV8カバレッジを強制フラッシュするエンドポイント。
+// PlaywrightがwebServerプロセスを強制終了する場合、NODE_V8_COVERAGEの
+// 自動書き出しが行われないため、テストごとに明示的にフラッシュする。
 if (process.env.E2E_COVERAGE === "1") {
   app.post("/__coverage/flush", (_req, res) => {
     try {
