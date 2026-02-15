@@ -9,7 +9,7 @@ export default defineConfig({
   outputDir: "./e2e-results",
   fullyParallel: false,
   workers: 1,
-  reporter: "html",
+  reporter: [["html", { open: "never" }]],
   use: {
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",
