@@ -15,6 +15,7 @@ export default defineConfig({
     fileParallelism: false,
     exclude: ["node_modules", "e2e"],
     coverage: {
+      provider: "v8",
       include: ["app/**/*.{ts,tsx}"],
     },
   },
