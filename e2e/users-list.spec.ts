@@ -39,13 +39,28 @@ test.describe("ユーザー一覧", () => {
   test("登録済みユーザーがテーブルに表示される", async ({ page }) => {
     await page.goto("/users");
 
-    await expect(
-      page.getByRole("cell", { name: "admin@example.com" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("cell", { name: "Administrator" }),
-    ).toBeVisible();
-    await expect(page.getByRole("link", { name: "編集" })).toBeVisible();
+    const table = page.getByRole("table");
+    const rows = table.getByRole("row");
+
+    // ヘッダー行 + データ1行
+    await expect(rows).toHaveCount(2);
+
+    // ヘッダー行の検証
+    await expect(rows.first().getByRole("columnheader")).toHaveText([
+      "ID",
+      "メールアドレス",
+      "ユーザー名",
+      "作成日時",
+      "操作",
+    ]);
+
+    // データ行の検証
+    const cells = rows.nth(1).getByRole("cell");
+    await expect(cells.nth(0)).toHaveText("1");
+    await expect(cells.nth(1)).toHaveText("admin@example.com");
+    await expect(cells.nth(2)).toHaveText("Administrator");
+    await expect(cells.nth(3)).not.toBeEmpty();
+    await expect(rows.nth(1).getByRole("link", { name: "編集" })).toBeVisible();
   });
 
   test("複数ユーザーが表示される", async ({ page }) => {
@@ -57,13 +72,21 @@ test.describe("ユーザー一覧", () => {
 
     await page.goto("/users");
 
-    await expect(
-      page.getByRole("cell", { name: "admin@example.com" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("cell", { name: "user2@example.com" }),
-    ).toBeVisible();
-    await expect(page.getByRole("cell", { name: "User Two" })).toBeVisible();
+    const table = page.getByRole("table");
+    const rows = table.getByRole("row");
+
+    // ヘッダー行 + データ2行
+    await expect(rows).toHaveCount(3);
+
+    // 1行目のデータ検証（作成日降順なので、後に作成したuser2が先）
+    const row1Cells = rows.nth(1).getByRole("cell");
+    await expect(row1Cells.nth(1)).toHaveText("user2@example.com");
+    await expect(row1Cells.nth(2)).toHaveText("User Two");
+
+    // 2行目のデータ検証
+    const row2Cells = rows.nth(2).getByRole("cell");
+    await expect(row2Cells.nth(1)).toHaveText("admin@example.com");
+    await expect(row2Cells.nth(2)).toHaveText("Administrator");
   });
 
   test("新規ユーザー登録ページに遷移できる", async ({ page }) => {

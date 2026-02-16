@@ -13,3 +13,6 @@ coverage*/
 /playwright-report/
 /blob-report/
 /.auth/
+
+# Claude Code
+.claude/settings.local.json

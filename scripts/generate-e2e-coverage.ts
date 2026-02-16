@@ -150,10 +150,12 @@ async function addCoverageFromDir(
 const report = MCR({
   name: "E2E Coverage (Client + Server)",
   outputDir: E2E_OUTPUT_DIR,
-  clean: true,
+  // .v8/ の生データを保持するため clean は無効にする。
+  // 古いデータは playwright.config.ts のコマンドで事前にクリアされる。
+  clean: false,
   cleanCache: true,
   reports: [
-    ["html"],
+    ["v8"],
     ["text-summary"],
     [
       "console-details",

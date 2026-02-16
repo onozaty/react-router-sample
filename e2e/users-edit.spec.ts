@@ -119,6 +119,72 @@ test.describe("ユーザー編集", () => {
     ).not.toBeVisible();
   });
 
+  test("パスワードを更新できる", async ({ page }) => {
+    await page.goto("/users");
+    await page.getByRole("link", { name: "編集" }).click();
+
+    await page.getByLabel("パスワード", { exact: true }).fill("newpassword123");
+    await page.getByLabel("パスワード確認").fill("newpassword123");
+    await page.getByRole("button", { name: "更新" }).click();
+
+    await expect(page).toHaveURL("/users");
+
+    // 変更後のパスワードでログインできることを確認
+    await page.goto("/logout");
+    await page.goto("/login");
+    await page.getByLabel("メールアドレス").fill("admin@example.com");
+    await page.getByLabel("パスワード").fill("newpassword123");
+    await page.getByRole("button", { name: "ログイン" }).click();
+
+    await expect(page).toHaveURL("/");
+  });
+
+  test("パスワードが6文字未満の場合エラーが表示される", async ({ page }) => {
+    await page.goto("/users");
+    await page.getByRole("link", { name: "編集" }).click();
+
+    await page.getByLabel("パスワード", { exact: true }).fill("short");
+    await page.getByLabel("パスワード確認").fill("short");
+    await page.getByRole("button", { name: "更新" }).click();
+
+    await expect(
+      page.getByText(
+        "パスワードは6文字以上で、確認用パスワードと一致している必要があります",
+      ),
+    ).toBeVisible();
+  });
+
+  test("パスワードと確認用パスワードが一致しない場合エラーが表示される", async ({
+    page,
+  }) => {
+    await page.goto("/users");
+    await page.getByRole("link", { name: "編集" }).click();
+
+    await page.getByLabel("パスワード", { exact: true }).fill("password123");
+    await page.getByLabel("パスワード確認").fill("different456");
+    await page.getByRole("button", { name: "更新" }).click();
+
+    await expect(
+      page.getByText(
+        "パスワードは6文字以上で、確認用パスワードと一致している必要があります",
+      ),
+    ).toBeVisible();
+  });
+
+  test("削除確認ダイアログでキャンセルすると削除されない", async ({ page }) => {
+    await page.goto("/users");
+    await page.getByRole("link", { name: "編集" }).click();
+
+    page.on("dialog", (dialog) => dialog.dismiss());
+    await page.getByRole("button", { name: "ユーザーを削除" }).click();
+
+    // 編集ページに留まっていることを確認
+    await expect(page).toHaveURL(/\/users\/\d+\/edit/);
+    await expect(
+      page.getByRole("heading", { name: "ユーザー編集" }),
+    ).toBeVisible();
+  });
+
   test("キャンセルでユーザー一覧に戻れる", async ({ page }) => {
     await page.goto("/users");
     await page.getByRole("link", { name: "編集" }).click();

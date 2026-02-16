@@ -102,6 +102,23 @@ test.describe("ユーザー新規作成", () => {
     ).toBeVisible();
   });
 
+  test("ユーザー名なしで登録できる", async ({ page }) => {
+    await page.goto("/users/new");
+
+    await page.getByLabel("メールアドレス").fill("noname@example.com");
+    await page.getByLabel(/^パスワード \*$/).fill("password123");
+    await page.getByLabel(/^パスワード確認/).fill("password123");
+    await page.getByRole("button", { name: "登録" }).click();
+
+    await expect(page).toHaveURL("/users");
+    await expect(
+      page.getByRole("cell", { name: "noname@example.com" }),
+    ).toBeVisible();
+    // ユーザー名が未設定の場合は「-」が表示される
+    const row = page.getByRole("row", { name: /noname@example\.com/ });
+    await expect(row.getByRole("cell").nth(2)).toHaveText("-");
+  });
+
   test("キャンセルでユーザー一覧に戻れる", async ({ page }) => {
     await page.goto("/users/new");
     await page.getByRole("link", { name: "キャンセル" }).click();

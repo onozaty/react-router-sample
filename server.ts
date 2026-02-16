@@ -4,7 +4,6 @@ import express, {
   type Request,
   type Response,
 } from "express";
-import * as v8 from "node:v8";
 import { logger } from "./app/lib/logger.server";
 
 // Short-circuit the type-checking of the built output.
@@ -48,6 +47,8 @@ app.disable("x-powered-by");
 // PlaywrightがwebServerプロセスを強制終了する場合、NODE_V8_COVERAGEの
 // 自動書き出しが行われないため、テストごとに明示的にフラッシュする。
 if (process.env.E2E_COVERAGE === "1") {
+  const v8 = await import("node:v8");
+
   app.post("/__coverage/flush", (_req, res) => {
     try {
       v8.takeCoverage();

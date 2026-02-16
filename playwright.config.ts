@@ -26,7 +26,7 @@ export default defineConfig({
   ],
   webServer: {
     command: coverageEnabled
-      ? "rm -rf coverage-e2e/.v8/server && mkdir -p coverage-e2e/.v8/server && dotenv -e .env.test -- pnpm run build && dotenv -e .env.test -- env E2E_COVERAGE=1 NODE_V8_COVERAGE=coverage-e2e/.v8/server node build/server.js"
+      ? "rm -rf coverage-e2e/.v8/server && dotenv -e .env.test -- pnpm run build && dotenv -e .env.test -- env E2E_COVERAGE=1 NODE_V8_COVERAGE=coverage-e2e/.v8/server node build/server.js"
       : "dotenv -e .env.test -- pnpm run prd",
     url: "http://localhost:3000",
     reuseExistingServer: coverageEnabled ? false : !process.env.CI,
