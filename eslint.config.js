@@ -6,7 +6,12 @@ import tseslint from "typescript-eslint";
 
 export default defineConfig([
   {
-    ignores: ["build/**", ".react-router/**", "node_modules/**"],
+    ignores: [
+      "build/**",
+      ".react-router/**",
+      "node_modules/**",
+      "coverage*/**",
+    ],
   },
   {
     files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
