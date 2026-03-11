@@ -1,24 +1,26 @@
 import * as bcrypt from "bcrypt";
-import { prisma } from "~/lib/db.server";
+import { sql } from "drizzle-orm";
+import { db, userAuths, users } from "~/lib/db.server";
 
 /**
  * テスト用にデータベースをリセット
  * 全テーブルをTRUNCATEし、AUTO_INCREMENTをリセット
  */
 export async function resetDb() {
-  const tablenames = await prisma.$queryRaw<Array<{ tablename: string }>>`
-    SELECT tablename FROM pg_tables WHERE schemaname='public'
-  `;
+  const tablenames = await db.execute<{ tablename: string }>(
+    sql`SELECT tablename FROM pg_tables WHERE schemaname='public'`,
+  );
 
   const tables = tablenames
-    .map(({ tablename }) => tablename)
-    .filter((name) => name !== "_prisma_migrations")
+    .map((row) => row.tablename)
     .map((name) => `"public"."${name}"`)
     .join(", ");
 
+  if (!tables) return;
+
   try {
-    await prisma.$executeRawUnsafe(
-      `TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE;`,
+    await db.execute(
+      sql.raw(`TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE;`),
     );
   } catch (error) {
     console.log({ error });
@@ -35,20 +37,17 @@ export async function createTestUser(data: {
 }) {
   const hashedPassword = await bcrypt.hash(data.password, 10);
 
-  const user = await prisma.user.create({
-    data: {
-      email: data.email,
-      username: data.username,
-      userAuth: {
-        create: {
-          hashedPassword,
-        },
-      },
-    },
-    include: {
-      userAuth: true,
-    },
-  });
+  return await db.transaction(async (tx) => {
+    const [user] = await tx
+      .insert(users)
+      .values({ email: data.email, username: data.username })
+      .returning();
 
-  return { user, password: data.password };
+    const [auth] = await tx
+      .insert(userAuths)
+      .values({ userId: user.userId, hashedPassword })
+      .returning();
+
+    return { user: { ...user, userAuth: auth }, password: data.password };
+  });
 }

@@ -1,7 +1,13 @@
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
+import { eq } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import * as schema from "./schema";
+import { userAuths, users } from "./schema";
 
-const prisma = new PrismaClient();
+// シードスクリプトは単体で実行されるため直接接続を作成
+const pg = postgres(process.env.DATABASE_URL!);
+const db = drizzle(pg, { schema });
 
 async function main() {
   // 環境変数から管理者ユーザーの情報を取得
@@ -12,11 +18,13 @@ async function main() {
   console.log("🌱 データベースのシード処理を開始します...");
 
   // 既存の管理者ユーザーをチェック
-  const existingUser = await prisma.user.findUnique({
-    where: { email: adminEmail },
-  });
+  const existing = await db
+    .select({ userId: users.userId })
+    .from(users)
+    .where(eq(users.email, adminEmail))
+    .limit(1);
 
-  if (existingUser) {
+  if (existing.length > 0) {
     console.log(`✅ 管理者ユーザー (${adminEmail}) は既に存在します。`);
     return;
   }
@@ -26,19 +34,18 @@ async function main() {
   const hashedPassword = await bcrypt.hash(adminPassword, salt);
 
   // 管理者ユーザーを作成
-  const user = await prisma.user.create({
-    data: {
-      email: adminEmail,
-      username: adminUsername,
-      userAuth: {
-        create: {
-          hashedPassword,
-        },
-      },
-    },
-    include: {
-      userAuth: true,
-    },
+  const [user] = await db.transaction(async (tx) => {
+    const inserted = await tx
+      .insert(users)
+      .values({ email: adminEmail, username: adminUsername })
+      .returning();
+
+    await tx.insert(userAuths).values({
+      userId: inserted[0].userId,
+      hashedPassword,
+    });
+
+    return inserted;
   });
 
   console.log(`✅ 管理者ユーザーを作成しました:`);
@@ -55,5 +62,5 @@ main()
     process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect();
+    await pg.end();
   });

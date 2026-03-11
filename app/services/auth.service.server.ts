@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
+import { eq } from "drizzle-orm";
 import { unstable_createContext } from "react-router";
-import { prisma } from "~/lib/db.server";
+import { db, userAuths, users } from "~/lib/db.server";
 import { getSession } from "~/lib/sessions.server";
 
 export interface AuthUser {
@@ -23,10 +24,13 @@ export const getAuthUser = async (
     return null;
   }
 
-  const user = await prisma.user.findUnique({
-    where: { userId },
-  });
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.userId, userId))
+    .limit(1);
 
+  const user = result[0];
   if (!user) {
     return null;
   }
@@ -39,23 +43,31 @@ export const getAuthUser = async (
 };
 
 export const authenticateUser = async (email: string, password: string) => {
-  const user = await prisma.user.findUnique({
-    where: { email },
-    include: { userAuth: true },
-  });
+  const result = await db
+    .select({
+      userId: users.userId,
+      email: users.email,
+      username: users.username,
+      hashedPassword: userAuths.hashedPassword,
+    })
+    .from(users)
+    .innerJoin(userAuths, eq(users.userId, userAuths.userId))
+    .where(eq(users.email, email))
+    .limit(1);
 
-  if (!user || !user.userAuth) {
+  const row = result[0];
+  if (!row) {
     return null;
   }
 
-  const isValid = await bcrypt.compare(password, user.userAuth.hashedPassword);
+  const isValid = await bcrypt.compare(password, row.hashedPassword);
   if (!isValid) {
     return null;
   }
 
   return {
-    userId: user.userId,
-    email: user.email,
-    username: user.username,
+    userId: row.userId,
+    email: row.email,
+    username: row.username,
   };
 };

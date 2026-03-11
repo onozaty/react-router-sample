@@ -1,12 +1,15 @@
-import { PrismaClient } from "@prisma/client";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import * as schema from "../../db/schema";
 
 declare global {
-  var __prisma__: PrismaClient;
+  var __db__: ReturnType<typeof drizzle<typeof schema>> | undefined;
 }
 
-if (!global.__prisma__) {
-  global.__prisma__ = new PrismaClient();
+if (!global.__db__) {
+  const pg = postgres(process.env.DATABASE_URL!);
+  global.__db__ = drizzle(pg, { schema });
 }
-const prisma = global.__prisma__;
 
-export { prisma };
+export const db = global.__db__;
+export * from "../../db/schema";

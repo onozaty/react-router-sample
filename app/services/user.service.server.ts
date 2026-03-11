@@ -1,6 +1,7 @@
-import type { User } from "@prisma/client";
 import bcrypt from "bcrypt";
-import { prisma } from "~/lib/db.server";
+import { desc, eq } from "drizzle-orm";
+import { db, userAuths, users } from "~/lib/db.server";
+import type { User } from "~/lib/db.server";
 
 const hashPassword = async (password: string): Promise<string> => {
   const salt = await bcrypt.genSalt();
@@ -8,17 +9,16 @@ const hashPassword = async (password: string): Promise<string> => {
 };
 
 export const getAllUsers = async () => {
-  return await prisma.user.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  return await db.select().from(users).orderBy(desc(users.createdAt));
 };
 
 export const getUserById = async (userId: number) => {
-  return await prisma.user.findUnique({
-    where: { userId },
-  });
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.userId, userId))
+    .limit(1);
+  return result[0] ?? null;
 };
 
 export const createUser = async (
@@ -29,15 +29,15 @@ export const createUser = async (
   // パスワードをハッシュ化
   const hashedPassword = await hashPassword(password);
 
-  return await prisma.user.create({
-    data: {
-      ...userData,
-      userAuth: {
-        create: {
-          hashedPassword,
-        },
-      },
-    },
+  return await db.transaction(async (tx) => {
+    const [user] = await tx.insert(users).values(userData).returning();
+
+    await tx.insert(userAuths).values({
+      userId: user.userId,
+      hashedPassword,
+    });
+
+    return user;
   });
 };
 
@@ -47,49 +47,68 @@ export const updateUser = async (
 ) => {
   const { password, ...userData } = data;
 
-  // ユーザー情報を更新
-  const updatedUser = await prisma.user.update({
-    where: { userId },
-    data: userData,
+  return await db.transaction(async (tx) => {
+    let updatedUser: User | undefined;
+
+    if (Object.keys(userData).length > 0) {
+      const [result] = await tx
+        .update(users)
+        .set(userData)
+        .where(eq(users.userId, userId))
+        .returning();
+      updatedUser = result;
+    } else {
+      const result = await tx
+        .select()
+        .from(users)
+        .where(eq(users.userId, userId))
+        .limit(1);
+      updatedUser = result[0];
+    }
+
+    // パスワードが提供された場合は認証情報も更新
+    if (password) {
+      const hashedPassword = await hashPassword(password);
+      await tx
+        .insert(userAuths)
+        .values({ userId, hashedPassword })
+        .onConflictDoUpdate({
+          target: userAuths.userId,
+          set: { hashedPassword },
+        });
+    }
+
+    return updatedUser;
   });
-
-  // パスワードが提供された場合は認証情報も更新
-  if (password) {
-    const hashedPassword = await hashPassword(password);
-    await prisma.userAuth.upsert({
-      where: { userId },
-      update: { hashedPassword },
-      create: { userId, hashedPassword },
-    });
-  }
-
-  return updatedUser;
 };
 
 export const deleteUser = async (userId: number) => {
-  return await prisma.user.delete({
-    where: { userId },
-  });
+  const [deleted] = await db
+    .delete(users)
+    .where(eq(users.userId, userId))
+    .returning();
+  return deleted;
 };
 
 export const checkEmailExists = async (
   email: string,
   excludeUserId?: number,
 ) => {
-  const user = await prisma.user.findUnique({
-    where: { email },
-    select: { userId: true },
-  });
+  const result = await db
+    .select({ userId: users.userId })
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
 
-  if (!user) return false;
-  if (excludeUserId && user.userId === excludeUserId) return false;
+  if (result.length === 0) return false;
+  if (excludeUserId && result[0].userId === excludeUserId) return false;
 
   return true;
 };
 
 export const updateLastLogin = async (userId: number) => {
-  await prisma.userAuth.update({
-    where: { userId },
-    data: { lastLoginAt: new Date() },
-  });
+  await db
+    .update(userAuths)
+    .set({ lastLoginAt: new Date() })
+    .where(eq(userAuths.userId, userId));
 };

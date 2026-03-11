@@ -12,13 +12,13 @@
       "extensions": [
         "esbenp.prettier-vscode",
         "dbaeumer.vscode-eslint",
-        "bradlc.vscode-tailwindcss",
-        "Prisma.prisma"
+        "bradlc.vscode-tailwindcss"
       ]
     }
   },
   "postCreateCommand": "pnpm install && pnpm typegen",
   "features": {
     "ghcr.io/anthropics/devcontainer-features/claude-code:latest": {}
-  }
+  },
+  "forwardPorts": [4983]
 }

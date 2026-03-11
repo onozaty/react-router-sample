@@ -1,7 +1,8 @@
 import { resetDb, createTestUser } from "@test/helpers/db";
 import * as bcrypt from "bcrypt";
+import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, it } from "vitest";
-import { prisma } from "~/lib/db.server";
+import { db, userAuths, users } from "~/lib/db.server";
 import {
   checkEmailExists,
   createUser,
@@ -34,10 +35,10 @@ describe("user.service.server", () => {
         password: "password2",
       });
 
-      const users = await getAllUsers();
+      const userList = await getAllUsers();
 
       // 作成日降順なので、user2が先
-      expect(users).toEqual([
+      expect(userList).toEqual([
         expect.objectContaining({ userId: user2.userId }),
         expect.objectContaining({ userId: user1.userId }),
       ]);
@@ -82,11 +83,13 @@ describe("user.service.server", () => {
       });
 
       // UserAuthが作成されていることを確認
-      const userAuth = await prisma.userAuth.findUnique({
-        where: { userId: newUser.userId },
-      });
+      const [userAuth] = await db
+        .select()
+        .from(userAuths)
+        .where(eq(userAuths.userId, newUser.userId))
+        .limit(1);
 
-      expect(userAuth).not.toBeNull();
+      expect(userAuth).not.toBeUndefined();
       expect(userAuth?.hashedPassword).toBeTruthy();
     });
 
@@ -98,9 +101,11 @@ describe("user.service.server", () => {
         password,
       });
 
-      const userAuth = await prisma.userAuth.findUnique({
-        where: { userId: newUser.userId },
-      });
+      const [userAuth] = await db
+        .select()
+        .from(userAuths)
+        .where(eq(userAuths.userId, newUser.userId))
+        .limit(1);
 
       // ハッシュ化されたパスワードは元のパスワードと異なる
       expect(userAuth?.hashedPassword).not.toBe(password);
@@ -142,9 +147,11 @@ describe("user.service.server", () => {
       });
 
       // 新しいパスワードで認証できることを確認
-      const userAuth = await prisma.userAuth.findUnique({
-        where: { userId: user.userId },
-      });
+      const [userAuth] = await db
+        .select()
+        .from(userAuths)
+        .where(eq(userAuths.userId, user.userId))
+        .limit(1);
 
       const isValid = await bcrypt.compare(
         newPassword,
@@ -165,16 +172,20 @@ describe("user.service.server", () => {
       await deleteUser(user.userId);
 
       // Userが削除されていることを確認
-      const deletedUser = await prisma.user.findUnique({
-        where: { userId: user.userId },
-      });
-      expect(deletedUser).toBeNull();
+      const [deletedUser] = await db
+        .select()
+        .from(users)
+        .where(eq(users.userId, user.userId))
+        .limit(1);
+      expect(deletedUser).toBeUndefined();
 
       // UserAuthもCascade削除されていることを確認
-      const deletedUserAuth = await prisma.userAuth.findUnique({
-        where: { userId: user.userId },
-      });
-      expect(deletedUserAuth).toBeNull();
+      const [deletedUserAuth] = await db
+        .select()
+        .from(userAuths)
+        .where(eq(userAuths.userId, user.userId))
+        .limit(1);
+      expect(deletedUserAuth).toBeUndefined();
     });
   });
 
@@ -226,18 +237,22 @@ describe("user.service.server", () => {
       });
 
       // 最初はlastLoginAtがnull
-      const userAuthBefore = await prisma.userAuth.findUnique({
-        where: { userId: user.userId },
-      });
+      const [userAuthBefore] = await db
+        .select()
+        .from(userAuths)
+        .where(eq(userAuths.userId, user.userId))
+        .limit(1);
       expect(userAuthBefore?.lastLoginAt).toBeNull();
 
       // updateLastLogin実行
       await updateLastLogin(user.userId);
 
       // lastLoginAtが設定されている
-      const userAuthAfter = await prisma.userAuth.findUnique({
-        where: { userId: user.userId },
-      });
+      const [userAuthAfter] = await db
+        .select()
+        .from(userAuths)
+        .where(eq(userAuths.userId, user.userId))
+        .limit(1);
       expect(userAuthAfter?.lastLoginAt).not.toBeNull();
       expect(userAuthAfter?.lastLoginAt).toBeInstanceOf(Date);
     });

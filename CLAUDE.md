@@ -17,10 +17,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm run format` - Prettierでコードフォーマット
 
 ### データベース操作
-- `pnpm run db:migrate` - スキーマ修正、マイグレート、生成、デプロイを実行
-- `pnpm run db:reset` - データベースをリセット（生成をスキップ）
-- `pnpm run db:deploy` - Prismaマイグレーションをデプロイ
+- `pnpm run db:generate` - マイグレーションファイルを生成
+- `pnpm run db:migrate` - マイグレーションファイルをDBに適用
+- `pnpm run db:reset` - DBを完全リセット（DROP→migrate→seed）
 - `pnpm run db:seed` - 初期データでデータベースをシード
+- `pnpm run db:studio` - Drizzle Studioを起動
+- `pnpm run db:test:push` - テスト用DBにスキーマを直接反映（履歴なし）
+- `pnpm run db:test:reset` - テスト用DBを完全リセット（DROP→push）
 
 ### 型生成
 - `pnpm run typegen` - React Router型を生成
@@ -35,10 +38,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **サービス**: 認証ロジックを`auth.service.server.ts`と`user.service.server.ts`に分離
 
 ### データベース・データ層
-- **ORM**: PostgreSQLでPrismaを使用
-- **モデル**: UserとUserAuthテーブルの1対1リレーション
-- **共有クライアント**: `app/lib/db.server.ts`がシングルトンPrismaクライアントを提供し、接続問題を回避
-- **シーディング**: `prisma/seed.ts`が管理者ユーザーを作成（環境変数で設定可能）
+- **ORM**: PostgreSQLでDrizzle ORMを使用
+- **スキーマ**: `db/schema.ts`でUserとUserAuthテーブルを定義（1対1リレーション）
+- **マイグレーション**: `drizzle/migrations/`にファイルを管理、`drizzle-kit generate` → `drizzle-kit migrate`のワークフロー
+- **共有クライアント**: `app/lib/db.server.ts`がシングルトンdrizzleクライアントを提供し、接続問題を回避
+- **シーディング**: `db/seed.ts`が管理者ユーザーを作成（環境変数で設定可能）
 
 ### React Router v7構造
 - **ファイルベースルーティング**: `@react-router/fs-routes`の`flatRoutes()`設定を使用
@@ -66,8 +70,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## データベーススキーマ注意点
 - ユーザーはセキュリティのため別の認証テーブル（UserAuth）を持つ
-- `@onozaty/prisma-db-comments-generator`を使用してPrismaスキーマからコメントを自動生成
-- 一貫性を保つためマイグレーション前にスキーマ修正が実行される
+- スキーマ変更時は`db:generate`でマイグレーションファイルを生成し、`db:migrate`で適用する
 
 ## 開発ルール
 
